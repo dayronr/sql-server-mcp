@@ -1,0 +1,43 @@
+{
+  "name": "mssql-mcp-server",
+  "version": "1.0.0",
+  "description": "Production-ready Database MCP Server with stored procedure management",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "echo \"Tests not yet implemented\" && exit 0",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write 'src/**/*.ts'"
+  },
+  "keywords": [
+    "mcp",
+    "mssql",
+    "sql-server",
+    "database",
+    "stored-procedures"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "mssql": "^11.0.1",
+    "tedious": "^18.6.1",
+    "zod": "^3.22.4",
+    "dotenv": "^16.4.5",
+    "winston": "^3.11.0",
+    "sql-formatter": "^15.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/mssql": "^9.1.5",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0"
+  }
+}
