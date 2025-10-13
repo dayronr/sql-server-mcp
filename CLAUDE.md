@@ -4,18 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Database MCP Server Implementation Guide** repository. It currently contains a comprehensive guide (`db_mcp_guide.md`) for building a production-ready Database MCP Server for Microsoft SQL Server with Node.js and TypeScript.
+This is a **production-ready MCP Server for Microsoft SQL Server**. It implements a complete Model Context Protocol (MCP) server with advanced database management capabilities including virtual filesystem protocol, stored procedure lifecycle management, transaction control, and comprehensive security features.
 
-**Current State**: This repository contains only documentation/guide. No actual implementation code exists yet.
+**Current State**: Fully functional implementation with all 4 phases complete. The repository also includes a comprehensive implementation guide (`db_mcp_guide.md`) for reference.
 
-## What This Guide Covers
+## Implementation Status
 
-The `db_mcp_guide.md` document is a complete implementation guide organized in 4 phases:
+This MCP server has **all 4 phases fully implemented**:
 
-1. **Phase 1: Read-Only Foundation** - Virtual filesystem for database objects, connection pooling, query execution
-2. **Phase 2: Safe Writes** - Transaction management, SQL validation, audit logging
-3. **Phase 3: SP Management** - Stored procedure lifecycle (draft → test → deploy → rollback) with versioning
-4. **Phase 4: Advanced Features** - Dependency analysis, reference finding, performance monitoring
+1. **Phase 1: Read-Only Foundation** ✅ - Virtual filesystem for database objects, connection pooling, query execution
+2. **Phase 2: Safe Writes** ✅ - Transaction management, SQL validation, audit logging
+3. **Phase 3: SP Management** ✅ - Stored procedure lifecycle (draft → test → deploy → rollback) with versioning
+4. **Phase 4: Advanced Features** ✅ - Dependency analysis, reference finding, performance monitoring
+
+A detailed implementation guide (`db_mcp_guide.md`) is available for reference.
 
 ## Key Architecture Concepts
 
@@ -45,34 +47,7 @@ The `db_mcp_guide.md` document is a complete implementation guide organized in 4
 - Transaction timeout protection (5 minutes)
 - Active transaction tracking
 
-## Implementation Approach
-
-If implementing from this guide:
-
-1. **Start with Phase 1** - Build read-only foundation first
-   - Project setup with TypeScript and MCP SDK
-   - Database connection manager with pooling
-   - Virtual filesystem implementation
-   - Basic discovery tools (search, schema inspection)
-
-2. **Add Phase 2 carefully** - Write operations require security
-   - Implement SQL validator before any write operations
-   - Transaction manager for safe execution
-   - Audit logger for compliance
-   - Write operation tools
-
-3. **Implement Phase 3** - SP management workflow
-   - Version manager for backup/restore
-   - Draft schema setup
-   - SP draft manager with rewrite logic
-   - Deployment and rollback tools
-
-4. **Enhance with Phase 4** - Advanced features
-   - Dependency analysis
-   - Reference finder
-   - Performance monitoring from DMVs
-
-## Technology Stack (from guide)
+## Technology Stack
 
 - **Runtime**: Node.js with TypeScript
 - **Database**: `mssql` and `tedious` packages for SQL Server
@@ -80,32 +55,27 @@ If implementing from this guide:
 - **Validation**: Zod for schema validation
 - **Utilities**: `winston` (logging), `sql-formatter`, `dotenv`
 
-## Testing Strategy (from guide)
-
-- Unit tests for validators, parsers, security components
-- Integration tests for end-to-end workflows (create → test → deploy)
-- Test fixtures for database state
-- Mock connections for isolated testing
-
 ## Configuration
 
-The guide includes comprehensive environment variable configuration:
+Environment variables (see `.env.example`):
 - Database connection strings (separate readonly/readwrite)
 - Security settings (write ops, max rows, blocked keywords)
 - Filesystem settings (virtual root, caching)
 - SP management (draft schema, version count)
 - Audit logging paths
 
-## MCP Tools Defined in Guide
+## Available MCP Tools
 
 **Discovery**: `search_stored_procedures`, `find_sp_references`, `get_dependencies`
-**Schema**: `get_table_schema`, `get_sp_definition`
-**Execution**: `execute_query_readonly`, `execute_query_write`, `execute_sp`
+**Schema**: `get_table_schema`
+**Execution**: `execute_query_write`
 **Transactions**: `begin_transaction`, `commit_transaction`, `rollback_transaction`
 **SP Management**: `create_sp_draft`, `test_sp_draft`, `deploy_sp`, `rollback_sp`, `list_sp_versions`
 **Performance**: `analyze_sp_performance`
 
-## File Organization (from guide)
+All tools are implemented in `src/tools/` and registered in `src/server.ts`.
+
+## Project Structure
 
 ```
 src/
@@ -144,11 +114,109 @@ The guide includes example interactions:
 - "rollback GetCustomerOrders to previous version"
 - "what stored procedures reference the Products table?"
 
-## Next Steps for Implementation
+## Getting Started
 
-1. Initialize Node.js project with TypeScript
-2. Install dependencies from guide
-3. Set up project structure
-4. Implement Phase 1 (read-only)
-5. Test with Claude Code MCP integration
-6. Progressively add Phase 2, 3, 4
+1. **Setup**
+   ```bash
+   npm install
+   npm run build
+   ```
+
+2. **Configuration**
+   - Copy `.env.example` to `.env`
+   - Configure database connection settings
+   - Adjust security settings as needed
+
+3. **Run**
+   ```bash
+   npm start              # Production
+   npm run dev            # Development with auto-reload
+   ```
+
+4. **Integrate with Claude Code**
+   - Add server configuration to `.claude.json` or `~/.claude.json`
+   - See README.md for complete configuration example
+
+## Development
+
+When working on this codebase:
+
+- **Adding new tools**: Create in `src/tools/`, register in `src/server.ts`
+- **Security first**: All write operations MUST go through `src/security/validator.ts`
+- **Logging**: Use logger from `src/config/logger.ts`, not console.log
+- **Testing**: Use the test environment in `test/` directory (see below)
+- **Transactions**: Managed by `src/database/transaction-manager.ts`
+- **Virtual filesystem**: Extend `src/filesystem/virtual-fs.ts` for new object types
+
+## Test Environment
+
+A complete Docker-based SQL Server test environment is included in the `test/` directory:
+
+**Quick Start:**
+```bash
+cd test
+./setup.sh init
+```
+
+**What's included:**
+- SQL Server 2022 in Docker (works on M4 Mac via Rosetta 2)
+- MCPTestDB database with sample data
+- 10 Customers, 15 Products, 10 Orders with relationships
+- 13 Stored Procedures covering various scenarios (SELECT, INSERT, UPDATE, DELETE, transactions)
+- Views and Functions for testing
+- Interactive management script (`setup.sh`) for common operations
+
+**Connection details:**
+- Server: `localhost,1433`
+- Database: `MCPTestDB`
+- Username: `sa`
+- Password: `McpTest123!`
+- TrustServerCertificate: `true`
+
+See `test/README.md` for complete documentation, testing scenarios, and troubleshooting.
+
+## Key Implementation Files
+
+### Core Infrastructure
+- `src/server.ts` - MCP server setup, tool registration, resource handlers
+- `src/index.ts` - Entry point, stdio transport initialization
+- `src/config/index.ts` - Environment configuration
+- `src/config/logger.ts` - Winston logging setup
+
+### Database Layer
+- `src/database/connection.ts` - Connection pool manager (read-only and read-write pools)
+- `src/database/query-executor.ts` - Query execution with error handling
+- `src/database/transaction-manager.ts` - Transaction lifecycle, timeout protection
+
+### Virtual Filesystem
+- `src/filesystem/virtual-fs.ts` - MCP resources protocol for database objects
+- `src/filesystem/uri-parser.ts` - URI parsing for `/database/*` paths
+- `src/filesystem/file-cache.ts` - Caching layer for database object metadata
+
+### Security & Validation
+- `src/security/validator.ts` - SQL validation, injection prevention, blocked keywords
+- `src/security/audit-logger.ts` - Audit trail for all operations
+
+### Tools
+- `src/tools/discovery/` - Search, dependency analysis, reference finding
+- `src/tools/schema/` - Table schema inspection
+- `src/tools/execution/` - Write query execution
+- `src/tools/transactions/` - Transaction control (begin/commit/rollback)
+- `src/tools/sp-management/` - Stored procedure draft/deploy/rollback workflow
+
+### Utilities
+- `src/utils/version-manager.ts` - SP version history management
+- `src/types/index.ts` - TypeScript type definitions
+
+## Potential Extensions
+
+Areas for future enhancement:
+
+1. **Testing Suite**: Unit and integration tests (currently placeholder)
+2. **Additional Object Types**: Add support for triggers, user-defined functions to virtual filesystem
+3. **Query Builder Tools**: Higher-level tools for common operations
+4. **Schema Migrations**: Tools for managing database schema changes
+5. **Backup/Restore**: Database backup and restore tools
+6. **User Management**: Tools for managing SQL Server users and permissions
+7. **Query Plan Analysis**: Deep dive into execution plans, not just statistics
+8. **Real-time Monitoring**: Active connection monitoring, blocking queries

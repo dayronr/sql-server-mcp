@@ -146,6 +146,42 @@ Analyze performance of GetDailySalesReport and show execution stats
 - **Audit Trail**: Logs all operations to file
 - **Separate Credentials**: Optional read-only and read-write connections
 
+## Testing
+
+A complete test environment is included in the `test/` directory:
+
+```bash
+cd test
+./setup.sh init
+```
+
+This sets up a Docker container with SQL Server 2022 and a test database (`MCPTestDB`) pre-populated with:
+- Sample tables (Customers, Products, Orders, etc.)
+- 13 test stored procedures
+- Views and functions
+- Sample data for testing all MCP features
+
+Connection string for testing:
+```
+Server=localhost,1433;Database=MCPTestDB;User Id=sa;Password=McpTest123!;TrustServerCertificate=true
+```
+
+### Running Tests
+
+After setting up the test database:
+
+```bash
+# Run all tests
+npm run test:all
+
+# Or run specific tests
+npm run test:connection  # Basic connectivity test
+npm run test:db         # Database object verification
+npm run test:scenarios  # Comprehensive functionality tests
+```
+
+See `test/README.md` for detailed testing scenarios and management commands.
+
 ## Development
 
 ```bash
@@ -168,21 +204,29 @@ npm run format
 ## Project Structure
 
 ```
-src/
-├── index.ts                    # Entry point
-├── server.ts                   # MCP server setup
-├── types/                      # TypeScript interfaces
-├── config/                     # Configuration and logging
-├── database/                   # Connection, query execution, transactions
-├── filesystem/                 # Virtual filesystem protocol
-├── tools/                      # MCP tool implementations
-│   ├── discovery/              # Search and discovery
-│   ├── schema/                 # Schema inspection
-│   ├── execution/              # Query execution
-│   ├── sp-management/          # SP lifecycle
-│   └── transactions/           # Transaction control
-├── security/                   # Validation, audit logging
-└── utils/                      # Version manager, helpers
+sql-server-mcp/
+├── src/
+│   ├── index.ts                    # Entry point
+│   ├── server.ts                   # MCP server setup
+│   ├── types/                      # TypeScript interfaces
+│   ├── config/                     # Configuration and logging
+│   ├── database/                   # Connection, query execution, transactions
+│   ├── filesystem/                 # Virtual filesystem protocol
+│   ├── tools/                      # MCP tool implementations
+│   │   ├── discovery/              # Search and discovery
+│   │   ├── schema/                 # Schema inspection
+│   │   ├── execution/              # Query execution
+│   │   ├── sp-management/          # SP lifecycle
+│   │   └── transactions/           # Transaction control
+│   ├── security/                   # Validation, audit logging
+│   └── utils/                      # Version manager, helpers
+├── test/                           # Test environment (Docker + SQL Server)
+│   ├── docker-compose.yml          # SQL Server 2022 container
+│   ├── setup.sh                    # Management script
+│   ├── init-scripts/               # Database initialization
+│   └── backups/                    # Database backups
+├── .env.example                    # Configuration template
+└── package.json
 ```
 
 ## License

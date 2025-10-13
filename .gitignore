@@ -30,3 +30,8 @@ Thumbs.db
 
 # Test coverage
 coverage/
+
+# Test environment
+test/backups/*.bak
+test/backups/*.trn
+test/.env

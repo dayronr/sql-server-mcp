@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "sql-server": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "dist/index.js"
+      ],
+      "env": {
+        "DB_SERVER": "localhost",
+        "DB_DATABASE": "MCPTestDB",
+        "DB_USER": "sa",
+        "DB_PASSWORD": "McpTest123!",
+        "DB_ENCRYPT": "true",
+        "DB_TRUST_SERVER_CERTIFICATE": "true",
+        "ENABLE_WRITE_OPERATIONS": "true",
+        "REQUIRE_TRANSACTIONS": "false",
+        "MAX_ROWS_AFFECTED": "10000",
+        "ENABLE_SP_MODIFICATIONS": "true",
+        "BLOCKED_KEYWORDS": "DROP DATABASE,xp_cmdshell,sp_configure",
+        "VIRTUAL_FS_ROOT": "/database",
+        "ENABLE_CACHE": "true",
+        "CACHE_TIMEOUT_MS": "300000",
+        "DRAFT_SCHEMA": "dbo_draft",
+        "AUTO_BACKUP_BEFORE_DEPLOY": "true",
+        "VERSION_HISTORY_COUNT": "5",
+        "ENABLE_AUDIT_LOG": "true",
+        "AUDIT_LOG_PATH": "./logs",
+        "LOG_LEVEL": "info"
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+# docker-compose.yml
+# SQL Server setup for MCP testing on M4 Mac
+
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mcp-sqlserver
+    platform: linux/amd64
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=McpTest123!
+      - MSSQL_PID=Developer
+      - MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+      - ./init-scripts:/docker-entrypoint-initdb.d
+      - ./backups:/var/opt/mssql/backups
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P McpTest123! -C -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - mcp-network
+
+volumes:
+  sqlserver-data:
+    driver: local
+
+networks:
+  mcp-network:
+    driver: bridge
