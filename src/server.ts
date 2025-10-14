@@ -20,7 +20,7 @@ import { ServerConfig } from './types/index.js';
 import { logger } from './config/logger.js';
 
 // Import tools
-import { searchStoredProceduresTool, searchStoredProcedures } from './tools/discovery/search-sp.js';
+import { searchStoredProceduresTool, searchStoredProcedures, listStoredProceduresTool, listStoredProcedures } from './tools/discovery/search-sp.js';
 import { getTableSchemaTool, getTableSchema } from './tools/schema/get-table-schema.js';
 import { executeQueryWriteTool, executeQueryWrite } from './tools/execution/execute-query-write.js';
 import { transactionTools, beginTransaction, commitTransaction, rollbackTransaction } from './tools/transactions/transaction-tools.js';
@@ -97,6 +97,7 @@ export class MCPDatabaseServer {
     // List available tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       const tools: any[] = [
+        listStoredProceduresTool,
         searchStoredProceduresTool,
         getTableSchemaTool,
         ...advancedTools
@@ -111,6 +112,8 @@ export class MCPDatabaseServer {
         }
       }
 
+      logger.info(`ListTools requested - returning ${tools.length} tools`);
+
       return { tools };
     });
 
@@ -120,6 +123,14 @@ export class MCPDatabaseServer {
 
       try {
         switch (name) {
+          case 'list_stored_procedures':
+            return {
+              content: [{
+                type: 'text',
+                text: JSON.stringify(await listStoredProcedures(this.queryExecutor, args as any), null, 2)
+              }]
+            };
+
           case 'search_stored_procedures':
             return {
               content: [{

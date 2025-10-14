@@ -2,12 +2,21 @@
 
 export interface DatabaseConfig {
   server: string;
+  port?: number;
   database: string;
   user?: string;
   password?: string;
   options?: {
     encrypt: boolean;
     trustServerCertificate: boolean;
+    connectionTimeout?: number;
+    requestTimeout?: number;
+    enableArithAbort?: boolean;
+  };
+  pool?: {
+    max?: number;
+    min?: number;
+    idleTimeoutMillis?: number;
   };
 }
 

@@ -1,6 +1,7 @@
 // src/tools/discovery/advanced-tools.ts
 
 import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import { QueryExecutor } from '../../database/query-executor.js';
 
 // Get Dependencies
@@ -107,11 +108,11 @@ export const advancedTools = [
   {
     name: 'get_dependencies',
     description: 'Analyze dependencies for a database object. Shows what it references and what references it.',
-    inputSchema: GetDependenciesSchema
+    inputSchema: zodToJsonSchema(GetDependenciesSchema)
   },
   {
     name: 'analyze_sp_performance',
     description: 'Analyze stored procedure performance including execution count, CPU time, duration, and logical reads from plan cache.',
-    inputSchema: AnalyzeSpPerformanceSchema
+    inputSchema: zodToJsonSchema(AnalyzeSpPerformanceSchema)
   }
 ];

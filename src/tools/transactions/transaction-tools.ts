@@ -1,6 +1,7 @@
 // src/tools/transactions/transaction-tools.ts
 
 import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import { TransactionManager } from '../../database/transaction-manager.js';
 import { AuditLogger } from '../../security/audit-logger.js';
 
@@ -84,16 +85,16 @@ export const transactionTools = [
   {
     name: 'begin_transaction',
     description: 'Start a new database transaction. Returns a transaction ID to use for subsequent operations.',
-    inputSchema: BeginTransactionSchema
+    inputSchema: zodToJsonSchema(BeginTransactionSchema)
   },
   {
     name: 'commit_transaction',
     description: 'Commit a transaction, making all changes permanent.',
-    inputSchema: CommitTransactionSchema
+    inputSchema: zodToJsonSchema(CommitTransactionSchema)
   },
   {
     name: 'rollback_transaction',
     description: 'Rollback a transaction, undoing all changes made within it.',
-    inputSchema: RollbackTransactionSchema
+    inputSchema: zodToJsonSchema(RollbackTransactionSchema)
   }
 ];

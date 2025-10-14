@@ -1,6 +1,7 @@
 // src/tools/execution/execute-query-write.ts
 
 import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import { TransactionManager } from '../../database/transaction-manager.js';
 import { SQLValidator } from '../../security/validator.js';
 import { AuditLogger } from '../../security/audit-logger.js';
@@ -104,5 +105,5 @@ export async function executeQueryWrite(
 export const executeQueryWriteTool = {
   name: 'execute_query_write',
   description: 'Execute a write query (INSERT, UPDATE, DELETE) against the database. Can be part of a transaction or auto-committed. Validates query safety before execution.',
-  inputSchema: ExecuteQueryWriteSchema
+  inputSchema: zodToJsonSchema(ExecuteQueryWriteSchema)
 };
