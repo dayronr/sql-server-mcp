@@ -1,6 +1,7 @@
 // src/tools/sp-management/sp-tools.ts
 
 import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import { SPDraftManager } from './sp-draft-manager.js';
 import { VersionManager } from '../../utils/version-manager.js';
 import { AuditLogger } from '../../security/audit-logger.js';
@@ -137,26 +138,26 @@ export const spManagementTools = [
   {
     name: 'create_sp_draft',
     description: 'Create a draft version of a stored procedure for testing. The draft is created in a separate schema and does not affect production.',
-    inputSchema: CreateDraftSchema
+    inputSchema: zodToJsonSchema(CreateDraftSchema)
   },
   {
     name: 'test_sp_draft',
     description: 'Test a draft stored procedure with specified parameters. Execute the draft version safely before deploying.',
-    inputSchema: TestDraftSchema
+    inputSchema: zodToJsonSchema(TestDraftSchema)
   },
   {
     name: 'deploy_sp',
     description: 'Deploy a tested draft to production. This backs up the current version automatically and can be rolled back.',
-    inputSchema: DeploySpSchema
+    inputSchema: zodToJsonSchema(DeploySpSchema)
   },
   {
     name: 'rollback_sp',
     description: 'Rollback a stored procedure to a previous version. Can specify version number or use latest backup.',
-    inputSchema: RollbackSpSchema
+    inputSchema: zodToJsonSchema(RollbackSpSchema)
   },
   {
     name: 'list_sp_versions',
     description: 'List all backed up versions of a stored procedure with metadata.',
-    inputSchema: ListVersionsSchema
+    inputSchema: zodToJsonSchema(ListVersionsSchema)
   }
 ];

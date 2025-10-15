@@ -1,6 +1,7 @@
 // src/tools/schema/get-table-schema.ts
 
 import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import { QueryExecutor } from '../../database/query-executor.js';
 
 export const GetTableSchemaSchema = z.object({
@@ -117,5 +118,5 @@ export async function getTableSchema(
 export const getTableSchemaTool = {
   name: 'get_table_schema',
   description: 'Get comprehensive schema information for a table including columns, data types, primary key, indexes, and foreign key relationships.',
-  inputSchema: GetTableSchemaSchema
+  inputSchema: zodToJsonSchema(GetTableSchemaSchema)
 };

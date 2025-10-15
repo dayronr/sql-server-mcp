@@ -16,16 +16,36 @@ export class ConnectionManager {
   async initialize(): Promise<void> {
     try {
       // Initialize read-only pool
+      const roPort = this.readonlyConfig.port || 1433;
+      logger.info(`Connecting to SQL Server: ${this.readonlyConfig.server}:${roPort}, Database: ${this.readonlyConfig.database}`);
       this.readonlyPool = await new sql.ConnectionPool(this.readonlyConfig).connect();
-      logger.info('Read-only connection pool initialized');
+      logger.info('Read-only connection pool initialized successfully');
 
       // Initialize read-write pool if configured
       if (this.readwriteConfig) {
+        const rwPort = this.readwriteConfig.port || 1433;
+        logger.info(`Connecting to SQL Server (read-write): ${this.readwriteConfig.server}:${rwPort}, Database: ${this.readwriteConfig.database}`);
         this.readwritePool = await new sql.ConnectionPool(this.readwriteConfig).connect();
-        logger.info('Read-write connection pool initialized');
+        logger.info('Read-write connection pool initialized successfully');
       }
-    } catch (error) {
-      logger.error('Failed to initialize connection pools', error);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Unknown error';
+      const errorCode = error?.code || 'N/A';
+      const port = this.readonlyConfig.port || 1433;
+      logger.error(`Failed to initialize connection pools: ${errorMessage} (Code: ${errorCode})`);
+      logger.error(`Server: ${this.readonlyConfig.server}:${port}, Database: ${this.readonlyConfig.database}`);
+
+      // Provide helpful error messages for common issues
+      if (errorMessage.includes('ECONNREFUSED')) {
+        logger.error('Connection refused - Is SQL Server running and accessible?');
+      } else if (errorMessage.includes('ENOTFOUND')) {
+        logger.error('Host not found - Check server name/IP address');
+      } else if (errorMessage.includes('Login failed')) {
+        logger.error('Authentication failed - Check DB_USER and DB_PASSWORD');
+      } else if (errorMessage.includes('timeout')) {
+        logger.error('Connection timeout - Check network connectivity and firewall settings');
+      }
+
       throw error;
     }
   }
